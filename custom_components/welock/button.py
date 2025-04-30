@@ -16,8 +16,9 @@ from .entity import WeLockEntity
 BUTTONS: dict[str, tuple[ButtonEntityDescription, ...]] = {
     DeviceType.WIFIBOX3.name: (
         ButtonEntityDescription(
-            key=BUTTON_WIFIBOX_KEY,
-            translation_key="button",
+            key=BUTTON_WIFIBOX_KEY, 
+			translation_key="button", 
+			has_entity_name=True
         ),
     )
 }
@@ -38,10 +39,11 @@ async def async_setup_entry(
         for device_id in device_list:
             device = hass_data.manager.device_map[device_id]
             if descriptions := BUTTONS.get(device.device_type.name):
-                for description in descriptions:
-                    entities.append(
-                        WeLockButtonEntity(device, description, hass_data.manager)
-                    )
+                entities.extend(
+                    WeLockButtonEntity(device, description, hass_data.manager)
+                    for description in descriptions
+                )
+
         async_add_entities(entities)
 
     entry.async_on_unload(
@@ -64,7 +66,6 @@ class WeLockButtonEntity(WeLockEntity, ButtonEntity):
         self.entity_description = description
         self._attr_unique_id = f"{super().unique_id}_{description.key}"
         self.res_manager = res_manager
-        self._attr_name = f"{self.device.device_name} {description.key}"
 
     async def async_press(self) -> None:
         """Handle the button press."""

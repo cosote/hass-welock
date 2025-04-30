@@ -21,6 +21,7 @@ LOCKS: dict[str, tuple[LockEntityDescription, ...]] = {
         LockEntityDescription(
             key=LOCK_WELOCK_KEY,
             translation_key="welocks",
+            has_entity_name=True,
             # icon="mdi:lock-open-variant-outline",
         ),
     )
@@ -42,10 +43,11 @@ async def async_setup_entry(
         for device_id in device_list:
             device = hass_data.manager.device_map[device_id]
             if descriptions := LOCKS.get(device.device_type.name):
-                for description in descriptions:
-                    entities.append(
-                        UserLockEntity(device, description, hass_data.manager)
-                    )
+                entities.extend(
+                    UserLockEntity(device, description, hass_data.manager)
+                    for description in descriptions
+                )
+
         async_add_entities(entities)
 
     entry.async_on_unload(
@@ -67,7 +69,6 @@ class UserLockEntity(WeLockEntity, LockEntity):
         super().__init__(device)
         self.entity_description = description
         self._attr_unique_id = f"{super().unique_id}_{description.key}"
-        self._attr_name = f"{self.device.device_name} {description.key}"
         self._attr_is_locked = True
         self.res_manager = res_manager
 

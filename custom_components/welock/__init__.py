@@ -121,7 +121,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: WelockConfigEntry) -> b
     if result:
         data = entry.runtime_data
         if data.manager.mqclient is not None:
-            data.manager.mqclient.stop()
+            await data.manager.mqclient.disconnect()
 
     return result
 

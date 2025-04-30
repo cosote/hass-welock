@@ -40,13 +40,13 @@
       "battery": {
         "name": "Battery"
       },
-      "lock": {
-        "welocks": {
-          "name": "Operation"
-        }
-      },
       "record": {
         "name": "Record"
+      }
+    },
+    "lock": {
+      "welocks": {
+        "name": "Operation"
       }
     },
     "switch": {

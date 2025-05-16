@@ -9,6 +9,6 @@
   "documentation": "https://github.com/hzjchina/hass-welock",
   "iot_class": "cloud_push",
   "issue_tracker": "https://github.com/hzjchina/hass-welock/issues",
-  "requirements": ["welock-iot==0.0.1"],
-  "version": "1.0.0"
+  "requirements": ["welock-iot==0.0.2"],
+  "version": "1.0.1"
 }

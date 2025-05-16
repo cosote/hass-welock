@@ -23,35 +23,39 @@ SENSORS: dict[str, tuple[SensorEntityDescription, ...]] = {
     DeviceType.WELOCK.name: (
         SensorEntityDescription(
             key=SENSOR_BATTERY_KEY,
-            translation_key="sensor.battery",
+            translation_key="battery",
             native_unit_of_measurement=PERCENTAGE,
             device_class=SensorDeviceClass.BATTERY,
             state_class=SensorStateClass.MEASUREMENT,
             entity_category=EntityCategory.DIAGNOSTIC,
             icon="mdi:battery-60",
+            has_entity_name=True,
         ),
         SensorEntityDescription(
             key=SENSOR_RECORD_KEY,
-            translation_key="sensor.record",
+            translation_key="record",
             icon="mdi:history",
+            has_entity_name=True,
         ),
     ),
     DeviceType.DOORS.name: (
         SensorEntityDescription(
             key=SENSOR_BATTERY_KEY,
-            translation_key="sensor.battery",
+            translation_key="battery",
             native_unit_of_measurement=PERCENTAGE,
             device_class=SensorDeviceClass.BATTERY,
             state_class=SensorStateClass.MEASUREMENT,
             entity_category=EntityCategory.DIAGNOSTIC,
             icon="mdi:battery-60",
+            has_entity_name=True,
         ),
     ),
     DeviceType.WIFIBOX3.name: (
         SensorEntityDescription(
             key=SENSOR_RECORD_KEY,
-            translation_key="sensor.record",
+            translation_key="record",
             icon="mdi:history",
+            has_entity_name=True,
         ),
     ),
 }
@@ -73,8 +77,10 @@ async def async_setup_entry(
         for device_id in device_list:
             device = hass_data.manager.device_map[device_id]
             if descriptions := SENSORS.get(device.device_type.name):
-                for description in descriptions:
-                    entities.append(BatteryEntity(device, description))
+                entities.extend(
+                    BatteryEntity(device, description) for description in descriptions
+                )
+
         async_add_entities(entities)
 
     entry.async_on_unload(
@@ -93,7 +99,6 @@ class BatteryEntity(WeLockEntity, SensorEntity):
         super().__init__(device)
         self.entity_description = description
         self._attr_unique_id = f"{super().unique_id}_{description.key}"
-        self._attr_name = f"{self.device.device_name} {description.key}"
 
     @property
     def native_value(self) -> StateType:

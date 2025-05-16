@@ -22,6 +22,7 @@ BINARYSENSORS: dict[str, tuple[BinarySensorEntityDescription, ...]] = {
             key=BINARYSENSORS_DOOR_KEY,
             device_class=BinarySensorDeviceClass.DOOR,
             translation_key="sensor_open",
+            has_entity_name=True,
         ),
     )
 }
@@ -42,8 +43,11 @@ async def async_setup_entry(
         for device_id in device_list:
             device = hass_data.manager.device_map[device_id]
             if descriptions := BINARYSENSORS.get(device.device_type.name):
-                for description in descriptions:
-                    entities.append(LockStateBinarySensorEntity(device, description))
+                entities.extend(
+                    LockStateBinarySensorEntity(device, description)
+                    for description in descriptions
+                )
+
         async_add_entities(entities)
 
     entry.async_on_unload(
@@ -62,7 +66,6 @@ class LockStateBinarySensorEntity(WeLockEntity, BinarySensorEntity):
         super().__init__(device)
         self.entity_description = description
         self._attr_unique_id = f"{super().unique_id}_{description.key}"
-        self._attr_name = f"{self.device.device_name} {description.key}"
 
     @property
     def is_on(self) -> bool:
